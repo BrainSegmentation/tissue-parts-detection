@@ -11,7 +11,7 @@ _Deadline:_ 19.11.
 
 ## Milestone 2
 _Deadline:_ 26.11. 
-- Reimplement existing projects, just getting the overview of the results
+- Explore existing projects and getting the overview of the results
 - One iteration of Machine Learning pipeline
 
 ## Milestone 3
