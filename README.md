@@ -12,11 +12,17 @@ _Deadline:_ 19.11.
 ## Milestone 2
 _Deadline:_ 26.11. 
 - Explore existing projects and getting the overview of the results
-- One iteration of Machine Learning pipeline
+- Creation of section (mag + brain parts) coordinates (txt file) 
+- Rotation Algo : Different Angles and Center of Rotation
+- First trial : Apply segmentation modesl on our data
+- Create Docker Image (Tensorflow / MAsk RCNN)
 
 ## Milestone 3
 _Deadline:_ 3.12. 
-- Another iteration of Machine Learning pipeline
+- From these sections : Create straight boxes of 1 section per boxes (+margin) --> For Detection Model beginning (Friday)
+- Saturation algo (create different images by changing color  : darker/lighter)
+- Create/clean full dataset of boxes for Detection Model
+- Create Detection Model 
 - TODO add 
 
 ## Milestone 4
