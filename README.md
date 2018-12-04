@@ -23,7 +23,7 @@ _Deadline:_ 3.12.
 - Saturation algo (create different images by changing color  : darker/lighter)
 - Create/clean full dataset of boxes for Detection Model
 - Create Detection Model 
-- TODO add 
+- Binary representation of fluorescent images of magnetic part (white on magnetic part)
 
 ## Milestone 4
 _Deadline:_ 10.12.
