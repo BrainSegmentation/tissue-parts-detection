@@ -1,6 +1,3 @@
 [submodule "dataset"]
 	path = dataset
 	url = https://github.com/BrainSegmentation/section-segmentation-dataset
-[submodule "MaskRCNN"]
-	path = toolbox/MaskRCNN
-	url = https://github.com/BrainSegmentation/Mask_RCNN.git
