@@ -5,6 +5,9 @@ Detecting tissue and magnet parts using Mask R-CNN
 When cloning the repo, use recursive method in order to download data from submodule as well:  
 `$ git clone https://github.com/BrainSegmentation/tissue-parts-detection.git --recursive`
 
+# Report
+[Read-Only link to Overleaf](https://www.overleaf.com/read/cqhkjdbxtmbr)
+
 # Milestones
 
 ## Milestone 1  
