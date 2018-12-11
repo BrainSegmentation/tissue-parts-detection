@@ -6,8 +6,11 @@ When cloning the repo, use recursive method in order to download data from submo
 `$ git clone https://github.com/BrainSegmentation/tissue-parts-detection.git --recursive`
 
 __Augmented Dataset__
+Training set : 
+https://mega.nz/#!JCpw3IAb!2j91l1G2n5EbvPd3XkEZZNqA1R2VytwXhUrUYTGlm7k
 
-https://mega.nz/#!lG5m1SbK!A3HqaLfcyfnqYJNgVBFrRBocQAIngIQi1W9mbtQf8R4
+Test set : 
+https://mega.nz/#!obgCUAiQ!ebwNPfEdWKcFBFDvX2KP1gFtAjZH2OW3HSXlwwzppG4
 
 # Report
 [Read-Only link to Overleaf](https://www.overleaf.com/read/cqhkjdbxtmbr)
