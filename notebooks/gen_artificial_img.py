@@ -243,7 +243,7 @@ def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background,
     else:
         full_image = np.zeros([height, width],dtype=np.uint8)
     full_image.fill(0)
-    nb_sections = 120
+    nb_sections = 150
 
     f_seg_tissues_artif = open(temp_path_seg_tissues,"w+")
     f_seg_mag_artif= open(temp_path_seg_mag,"w+")
@@ -253,20 +253,24 @@ def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background,
         # Section selection
         # section_num will be use to load the data image, and to load the corrects segmentation boxes
 
-        section_num = random.randint(0, max_num_section)
-        path_img= str(WAFER_CROPPED_PATH)+"/extract/"+str(section_num)+".tif"
-        if(rgb==True):
-            section = cv.imread(path_img)
-        else:
-            section = cv.imread(path_img,0)
+        free_place = False
+        try_section = 0
+        while((free_place ==False) & (try_section < 5)):
+            section_num = random.randint(0, max_num_section)
+            path_img= str(WAFER_CROPPED_PATH)+"/extract/"+str(section_num)+".tif"
+            if(rgb==True):
+                section = cv.imread(path_img)
+            else:
+                section = cv.imread(path_img,0)
 
-        height_section = section.shape[0]
-        width_section = section.shape[1]
+            height_section = section.shape[0]
+            width_section = section.shape[1]
 
-        # Collision boxes to not interfere with other sections
-        nb_collision_boxes = 40
+            # Collision boxes to not interfere with other sections
+            nb_collision_boxes = 40
 
-        xpos_section, ypos_section, free_place = check_avail_area(full_image,section, width, width_section, height, height_section, nb_collision_boxes, rgb)
+            xpos_section, ypos_section, free_place = check_avail_area(full_image,section, width, width_section, height, height_section, nb_collision_boxes, rgb)
+            try_section += 1
 
         if(free_place == False):
             # No more space
@@ -305,6 +309,8 @@ def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background,
                 for j in range(backgnd.shape[1]):
                     if(np.mean(full_image[height_subbckgnd*ind_y + i , width_subbckgnd*ind_x + j]) == 0):
                         full_image[height_subbckgnd*ind_y + i, width_subbckgnd*ind_x + j] = backgnd[i,j]
+
+    full_image = cv.cvtColor(full_image, cv.COLOR_BGR2RGB)
 
     return full_image
 
