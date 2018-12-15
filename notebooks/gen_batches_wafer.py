@@ -25,7 +25,7 @@ def generate_mask(image, points):
     return img_mask
 
 
-def generate_batches(DATASET_NUMBER, number_of_sections, section_size, rgb):
+def generate_batches(DATASET_NUMBER, rgb, number_of_sections, section_size ):
 
     index = pd.MultiIndex.from_tuples([('point_1', 'x'), ('point_1', 'y'), ('point_2', 'x'), ('point_2', 'y'),
                                    ('point_3', 'x'), ('point_3', 'y'), ('point_4', 'x'), ('point_4', 'y')])
@@ -34,7 +34,7 @@ def generate_batches(DATASET_NUMBER, number_of_sections, section_size, rgb):
     if(rgb==True):
         file = "../augmented_dataset/wafer_with_fluo_RGB_"+str(DATASET_NUMBER)+".tif"
     else:
-        file = "../dataset/silicon_wafer_"+str(DATASET_NUMBER)+"/wafer_"+str(DATASET_NUMBER)"_downsized_3_intensityCorrected.tif"
+        file = "../dataset/silicon_wafer_"+str(DATASET_NUMBER)+"/wafer_"+str(DATASET_NUMBER)+"_downsized_3_intensityCorrected.tif"
     wafer = Image.open(file)
     seg_tissues = pd.read_csv("../dataset/silicon_wafer_"+str(DATASET_NUMBER)+"/source_sections_tissue_scale3.txt", sep="\t|,", header=None, names=index, engine='python')
     seg_mag = pd.read_csv("../dataset/silicon_wafer_"+str(DATASET_NUMBER)+"/source_sections_mag_scale3.txt", sep="\t|,", header=None, names=index, engine='python')
@@ -72,14 +72,14 @@ def generate_batches(DATASET_NUMBER, number_of_sections, section_size, rgb):
                 mag_indicies.append(index)
 
 
-        if( (len(tissue_indicies) >=3) & (len(mag_indicies) >=3) ):
+        if( (len(tissue_indicies) >=4) & (len(mag_indicies) >=4) ):
 
             # creating directories to store results
-            image_folder = f"../augmented_dataset/stage1/wafer{str(DATASET_NUMBER)}_crop"+str(i)+"/image/"
+            image_folder = "../augmented_dataset/stage1/wafer"+str(DATASET_NUMBER)+"_crop"+str(i)+"/image/"
             os.makedirs(os.path.dirname(image_folder), exist_ok=True)
-            tissue_masks_folder = f"../augmented_dataset/stage1/wafer{str(DATASET_NUMBER)}_crop"+str(i)+"/tissue_masks/"
+            tissue_masks_folder = "../augmented_dataset/stage1/wafer"+str(DATASET_NUMBER)+"_crop"+str(i)+"/tissue_masks/"
             os.makedirs(os.path.dirname(tissue_masks_folder), exist_ok=True)
-            magnetic_masks_folder = f"../augmented_dataset/stage1/wafer{str(DATASET_NUMBER)}_crop"+str(i)+"/magnetic_masks/"
+            magnetic_masks_folder = "../augmented_dataset/stage1/wafer"+str(DATASET_NUMBER)+"_crop"+str(i)+"/magnetic_masks/"
             os.makedirs(os.path.dirname(magnetic_masks_folder), exist_ok=True)
 
             # creating tissue part mask
@@ -123,7 +123,7 @@ def main():
 
     if len(sys.argv) < 5:
         if len(sys.argv) == 2 and sys.argv[1] == "help":
-            print("""format: python3 labelimage.py <dataset number> <'rgb' / 'grayscale'> <nb artificial images> <nb batches per images> <section size> """)
+            print("""format: python3 gen_batches_wafer.py <dataset number> <'rgb' / 'grayscale'> <nb batches> <section size> """)
             sys.exit()
         else:
             raise ValueError("Invalid number of arguments! Type help as arguments")
@@ -140,11 +140,10 @@ def main():
     else:
         raise ValueError("arg2 : Choose between 'rgb' or 'grayscale'")
 
-    nb_artificial_images =  int(sys.argv[3])
-    number_batches = int(sys.argv[4])
+    number_batches = int(sys.argv[3])
 
-    if(len(sys.argv) == 6):
-        section_size = int(sys.argv[5])
+    if(len(sys.argv) == 5):
+        section_size = int(sys.argv[4])
     else:
         section_size = 512
 
@@ -155,50 +154,7 @@ def main():
     else:
         path_rgb="intensity"
 
-    AUGMENTED_DATASET_PATH = "../augmented_dataset"
-    WAFER_CROPPED_PATH = str(AUGMENTED_DATASET_PATH)+"/wafer_"+str(path_rgb)+"_cropped_"+str(DATASET_NUMBER)
-
-    index = pd.MultiIndex.from_tuples([('point_1', 'x'), ('point_1', 'y'), ('point_2', 'x'), ('point_2', 'y'),
-                                       ('point_3', 'x'), ('point_3', 'y'), ('point_4', 'x'), ('point_4', 'y')])
-
-    seg_coord_tissues = pd.read_csv(str(WAFER_CROPPED_PATH)+"/boxes_tissues.txt", sep="\t|,", header=None, names=index, engine='python')
-    seg_coord_mag = pd.read_csv(str(WAFER_CROPPED_PATH)+"/boxes_mag.txt", sep="\t|,", header=None, names=index, engine='python')
-
-    path_background= str(AUGMENTED_DATASET_PATH)+"/background_"+str(path_rgb)+"_wafer"+str(DATASET_NUMBER)+".tif"
-    if(rgb==True):
-        backgnd = cv.imread(path_background)
-    else:
-        backgnd = cv.imread(path_background,0)
-
-
-
-    if(DATASET_NUMBER == 1):
-        max_num_section = 100
-    elif(DATASET_NUMBER == 2):
-        max_num_section = 35
-    else:
-        max_num_section = 69
-
-
-    # Size of artificial image (grid_background*size of background) for height and width
-    grid_background = 4
-
-
-    temp_path_seg_tissues = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_tissues_artif.txt"
-    temp_path_seg_mag = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_mag_artif.txt"
-
-    random.seed(22) # Initialize random for the next methods in artifial images generation
-    for index_artificial_image in range(nb_artificial_images):
-        print("Generating Artificial Image "+str(index_artificial_image))
-        res = create_artificial_images(index_artificial_image, DATASET_NUMBER, backgnd, grid_background, seg_coord_tissues, seg_coord_mag, rgb, max_num_section, temp_path_seg_tissues, temp_path_seg_mag )
-
-        # Generate artificial batches
-        if(rgb==True):
-            wafer = Image.fromarray(np.uint8(res),'RGB')
-        else:
-            wafer = Image.fromarray(np.uint8(res))
-        print("Create  "+str(number_batches)+ " batches from Artificial Image "+str(index_artificial_image))
-        generate_artificial_batches(wafer, number_batches, index_artificial_image, DATASET_NUMBER, section_size, temp_path_seg_tissues, temp_path_seg_mag )
+    generate_batches(DATASET_NUMBER, rgb, number_batches, section_size )
 
 
 if __name__ == "__main__":
