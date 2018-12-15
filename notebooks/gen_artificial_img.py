@@ -332,8 +332,6 @@ def write_coordinates_file(coordinate_section,xpos_section, ypos_section, file_t
         file_towrite.write("%d,%d\t%d,%d\t%d,%d\t%d,%d\r\n" % (seg_p1_x,seg_p1_y,  seg_p2_x,seg_p2_y,  seg_p3_x,seg_p3_y,  seg_p4_x,seg_p4_y))
 
 
-
-
 # ----
 
 
@@ -341,7 +339,7 @@ def main():
 
     if len(sys.argv) < 5:
         if len(sys.argv) == 2 and sys.argv[1] == "help":
-            print("""format: python3 labelimage.py <dataset number> <'rgb' / 'grayscale'> <nb artificial images> <nb batches per images> <section size> """)
+            print("""format: python3 gen_artificial_img.py <dataset number> <'rgb' / 'grayscale'> <nb artificial images> <nb batches per images> <section size> """)
             sys.exit()
         else:
             raise ValueError("Invalid number of arguments! Type help as arguments")
