@@ -309,8 +309,8 @@ def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background,
                 for j in range(backgnd.shape[1]):
                     if(np.mean(full_image[height_subbckgnd*ind_y + i , width_subbckgnd*ind_x + j]) == 0):
                         full_image[height_subbckgnd*ind_y + i, width_subbckgnd*ind_x + j] = backgnd[i,j]
-
-    full_image = cv.cvtColor(full_image, cv.COLOR_BGR2RGB)
+    if(rgb==True):
+        full_image = cv.cvtColor(full_image, cv.COLOR_BGR2RGB)
 
     return full_image
 
