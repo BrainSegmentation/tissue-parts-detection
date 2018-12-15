@@ -8,7 +8,7 @@
 	# mag
 	# envelope
 		# it would typically involve the nearby dummy. The envelope is used for collision checks
-		
+
 # Workflow
 	# for throw in range(throws):
 		# pick random template
@@ -17,4 +17,31 @@
 			# extract the box in envIm (the current image keeping track of the thrown envelopes)
 			# locally add the throw
 			# check if collision
-			# fill current enveloppes
+			# fill current enveloppes# Workflow
+			
+rootFolder = r'C:\Collectome\Students\Docs\RawWafers\BIOPWafers\newWafersBIOP\Wafer_14'		
+
+nThrows = 300
+patchSize = np.array([600,600])
+basketSize = 1.2 * patchSize # size of the large picture in which sections are thrown (sections are thrown into the basket). Will be cropped to patchSize after throwing.
+
+# read templates
+	templates = {}
+	templates['n']['mag/tissue/envelope']['mask/points']
+
+# populate nOrientations for each template
+	
+
+for idThrow in range(nThrows):
+	basket = np.zeros((*basketSize), np.uint8)
+	
+	# pick random template with a random orientation
+	template = templates[random.choice(list(a))]
+	
+	# randomly throw
+		x,y = 
+				
+	# extract the box in basket (the current image keeping track of the thrown envelopes)
+	# locally add the throw
+	# check if collision
+	# fill current enveloppes
