@@ -389,7 +389,7 @@ def main():
     elif(DATASET_NUMBER == 2):
         max_num_section = 35
     else:
-        max_num_section = 70
+        max_num_section = 69
 
 
     # Size of artificial image (grid_background*size of background) for height and width
