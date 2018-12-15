@@ -400,8 +400,8 @@ def main():
     grid_background = 4
 
 
-    temp_path_seg_tissues = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_tissues_artif.txt"
-    temp_path_seg_mag = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_mag_artif.txt"
+    temp_path_seg_tissues = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_tissues_artif_"+str(DATASET_NUMBER)+".txt"
+    temp_path_seg_mag = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_mag_artif_"+str(DATASET_NUMBER)+".txt"
 
     random.seed(22) # Initialize random for the next methods in artifial images generation
     for index_artificial_image in range(nb_artificial_images):
