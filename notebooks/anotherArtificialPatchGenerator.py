@@ -22,34 +22,32 @@
 import json
 import os
 import random
+import scipy.spatial.distance
 import numpy as np
 import cv2 as cv
 
-rootFolder = r'C:\Collectome\Students\Docs\RawWafers\BIOPWafers\newWafersBIOP\Wafer_14'		
+rootFolder = r'C:\Collectome\Students\Docs\RawWafers\BIOPWafers\newWafersBIOP\Wafer_14'
 jsonPath = r'C:\Collectome\Students\Docs\RawWafers\BIOPWafers\newWafersBIOP\Wafer_14\stitched_BF_Test_small.json'
 
-
-nThrows = 300
-patchSize = np.array([600,600])
+nThrows = 1000
+patchSize = np.array([300,800])
 basketSize = (1.4 * patchSize).astype(int) # size of the large picture in which sections are thrown (sections are thrown into the basket). Will be cropped to patchSize after throwing.
-throwSize = (1.2 * patchSize).astype(int) # size of the area in which the sections are thrown
+# throwSize = (1.2 * patchSize).astype(int) # size of the area in which the sections are thrown
 
 # read templates
+# templates['n']['mag/tissue/envelope/bbox/centroid']['points/im/mask']
 templates = {}
 
 with open(jsonPath, 'r') as f:
 	labelmeJson = json.load(f)
-print(labelmeJson.keys())
+
 imName = labelmeJson['imagePath']
 fluoName = imName.replace('BF_Test', 'DAPI')
-
 imPath = os.path.join(os.path.dirname(jsonPath), imName)
 fluoPath = os.path.join(os.path.dirname(jsonPath), fluoName)
-
 im = cv.imread(imPath)
 
-# templates['n']['mag/tissue/envelope/bbox/centroid']['points/im/mask']
-sections = zip(*(iter(labelmeJson['shapes']),) * 3)
+sections = zip(*(iter(labelmeJson['shapes']),) * 3) # 3 types of manual input: tissue, magnet, envelope
 for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
 	templates[id] = {}
 
@@ -82,6 +80,8 @@ for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
 	imCropped = im[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]]
 	imMasked = cv.bitwise_and(imCropped, imCropped, mask = eMask)
 	templates[id]['e']['im'] = imMasked
+	
+	templates[id]['eSize'] = cv.countNonZero(eMask)
 
 	# cv.imshow('image',imMasked)
 	# cv.waitKey(0)
@@ -96,17 +96,53 @@ for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
 # populate nOrientations for each template
 
 # templates['n']['mag/tissue/envelope/bbox/centroid']['points/im/mask']
+successfulThrows = []
+basket = np.zeros(basketSize, np.uint8)
 for idThrow in range(nThrows):
-	basket = np.zeros(basketSize, np.uint8)
+	# centroids = [np.array([0,0]).astype(int)] # centroids of thrown sections (simpler to initialize with 0,0)
 	
 	# pick random template with a random orientation
-	template = templates[random.choice(list(templates.keys()))]
-	
+	templateId = random.choice(list(templates.keys()))
+	template = templates[templateId]
+	bbox = template['bbox']
+	# throwSize = basketSize - np.array([bbox[2], bbox[3]])
+	throwSize = basketSize - np.array([bbox[3], bbox[2]])
 	# randomly throw
-	x = random.randint((patchSize[0]-throwSize[0])/2, patchSize[0] - (patchSize[0]-throwSize[0])/2)
-	y = random.randint((patchSize[1]-throwSize[1])/2, patchSize[1] - (patchSize[1]-throwSize[1])/2)
-				
+	x = random.randint(0, throwSize[1])
+	y = random.randint(0, throwSize[0])
+	
+	# # quick brute force check with the existing centroids
+	# dists = scipy.spatial.distance.cdist(centroids, np.array([[x,y]]))
+	# if min(dists) > template['bbox'][2] + template['bbox'][3]
+	
 	# extract the box in basket (the current image keeping track of the thrown envelopes)
-	# locally add the throw
-	# check if collision
-	# fill current enveloppes
+	basketBox = basket[y:y+bbox[3], x:x+bbox[2]] # attention with x,y flip
+	# # cv.imshow('image',basketBox)
+	# # cv.waitKey(0)
+	currentWhite = cv.countNonZero(basketBox)
+	print('basketBox.shape', basketBox.shape, "template['e']['mask'].shape", template['e']['mask'].shape)
+	print(x, y, idThrow)
+	basketBoxAfterThrow = cv.add(basketBox, template['e']['mask'])
+	# # cv.imshow('image',basketBoxAfterThrow)
+	# # cv.waitKey(0)
+	whiteAfterThrow = cv.countNonZero(basketBoxAfterThrow)
+	if whiteAfterThrow - currentWhite == template['eSize']:
+		print('no collision', x, y, idThrow)
+		basket[y:y+bbox[3], x:x+bbox[2]] = basketBoxAfterThrow
+		successfulThrows.append([templateId, x, y])
+cv.imshow('image',basket)
+cv.waitKey(0)
+cv.destroyAllWindows()
+
+# generate tissueMasks, magMasks, artiPatch, artiFluo,
+
+magMask = np.zeros(basketSize, np.uint8)
+tissueMask = np.zeros(basketSize, np.uint8)
+for templateId, x, y in successfulThrows:
+	bbox = templates[templateId]['bbox']
+	
+	magMask[y:y+bbox[3], x:x+bbox[2]] = cv.add(magMask[y:y+bbox[3], x:x+bbox[2]], templates[templateId]['m']['mask'])
+cv.imshow('image', magMask)
+cv.waitKey(0)
+cv.destroyAllWindows()
+	
