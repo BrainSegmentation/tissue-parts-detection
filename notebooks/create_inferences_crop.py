@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 import cv2 as cv
-import shutil7
+import shutil
 
 DATASET_NUMBER = 11
 
