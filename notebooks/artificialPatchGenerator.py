@@ -4,7 +4,7 @@ The user manually labels the following ***in this order*** with the labelme GUI 
     -tissue polygon (in labelme you can create a single label 'tissue' for example)
     -mag polygon (in labelme you can create a single label 'mag' for example)
     -envelope polygon : the envelope typically involves the nearby dummy. The envelope is used for collision checks when throwing sections
-  a single background area free of sections (should be larger than the final patch size)
+  a single *roughly rectangular* background area free of sections (should be larger than the final patch size)
 
 Data structure required : in one folder you have:
   - the brightfield wafer overview that contains "BF_Test" in its name
@@ -73,7 +73,8 @@ imFluo = cv.imread(fluoPath, 0)
 w,h = im.shape
 angles = np.linspace(start=0, stop=360, num=nAngles)[:-1]
 counter = 0
-for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
+
+for t,m,e in sections: # tissue, magnet, envelope
 	for angle in angles:
 		# get a larger bbox around the template to make rotations
 		bbox = cv.boundingRect(np.array(e['points'])) # the bounding box of the envelope
@@ -168,7 +169,7 @@ backgroundBbox = cv.boundingRect(backgroundPoints)
 bx = backgroundBbox[0] + backgroundBbox[2]
 by = backgroundBbox[1] + backgroundBbox[3]
 shiftSize = (basketSize * 0.2).astype(int) # how much does the window slide to generate the background (these are subpatches of the manually selected (large) background area)
-for x in range(10): # no need to bother with correct indices, just try 10x10 boxes, it's enough
+for x in range(10): # no need to bother with correct indices, just try 10x10 boxes and check whether they are in the image
 	for y in range(10):
 		x1 = backgroundBbox[0] + x*shiftSize[0]
 		y1 = backgroundBbox[1] + y*shiftSize[1]
@@ -227,11 +228,7 @@ for idPatch in range(nPatches):
 
 	# choose a background randomly
 	backgroundId = random.randint(0, len(backgrounds)-1)
-	
-	imPath = os.path.join(imageFolder, 'patch_' + str(idPatch).zfill(4) + '.tif')
 	imPatch = copy.deepcopy(backgrounds[backgroundId])
-	
-	fluoPath = os.path.join(imageFolder, 'patch_' + str(idPatch).zfill(4) + '_fluo.tif')
 	fluoPatch = copy.deepcopy(backgroundsFluo[backgroundId])
 	
 	# create the images
@@ -252,7 +249,7 @@ for idPatch in range(nPatches):
 		tissueMask = tissueMask[offset[1]:patchSize[1]+offset[1], offset[0]:patchSize[0]+offset[0]] # crop to patchSize
 		cv.imwrite(tissueMaskPath, tissueMask)
 
-		# to add an image to a background, first the background is masked with the invert of the local envelope
+		# to add an image to a background, the background is first masked with the invert of the local envelope before adding the image
 		eMask = template['e']['mask']
 		eMaskInvert = cv.bitwise_not(eMask)
 		
@@ -264,6 +261,9 @@ for idPatch in range(nPatches):
 		fluoPatchBox = cv.bitwise_and(fluoPatchBox, fluoPatchBox, mask = eMaskInvert)
 		fluoPatch[y:y+bbox[3], x:x+bbox[2]] = cv.add(fluoPatchBox, template['e']['fluo'])
 		
+	fluoPath = os.path.join(imageFolder, 'patch_' + str(idPatch).zfill(4) + '_fluo.tif')
+	imPath = os.path.join(imageFolder, 'patch_' + str(idPatch).zfill(4) + '.tif')
+	
 	fluoPatch = fluoPatch[offset[1]:patchSize[1]+offset[1], offset[0]:patchSize[0]+offset[0]] # crop to patchSize
 	cv.imwrite(fluoPath, fluoPatch)	
 	
