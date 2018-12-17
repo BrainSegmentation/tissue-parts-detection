@@ -1,28 +1,57 @@
-# with labelme the user manually labels the following *in this order*
-	# for each section template (typically 5, ideally with slightly different looks)
-		# tissue polygon
-		# mag polygon
-		# envelope polygon : the envelope typically involves the nearby dummy. The envelope is used for collision checks
-	# a background area free of sections
+"""
+The user manually labels the following ***in this order*** with the labelme GUI and saves a json file:
+  for each section template (ideally they have slightly different looks):
+    -tissue polygon (in labelme you can create a single label 'tissue' for example)
+    -mag polygon (in labelme you can create a single label 'mag' for example)
+    -envelope polygon : the envelope typically involves the nearby dummy. The envelope is used for collision checks when throwing sections
+  a single background area free of sections (should be larger than the final patch size)
 
+Data structure required : in one folder you have:
+  - the brightfield wafer overview that contains "BF_Test" in its name
+  - the fluo wafer overview which has the same name as the brightfield channel but with "BF_Test" replaced by "DAPI"
+  - the labelme json file saved from the GUI
+  
+Example call:
+python artificialPatchGenerator.py yourJsonPath.json
+python artificialPatchGenerator.py yourJsonPath.json -p 100 -t 2000 -a 30 -x 700 -y 700
+"""
 import json
 import os
 import random
 import pathlib
 import copy
+import argparse
+from argparse import RawTextHelpFormatter
 import numpy as np
 import cv2 as cv
 
-jsonPath = r'C:\Collectome\Students\Docs\RawWafers\BIOPWafers\newWafersBIOP\Wafer_14\stitched_BF_Test_small.json'
+###################
+# Parsing arguments
+parser = argparse.ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
+# parser.add_argument('-j', '--json', help='the labelme json file', required=True)
+parser.add_argument('json', help='the labelme json file')
+parser.add_argument('-p', '--patches', help='number of patches (default = 100)', required=False, default=100)
+parser.add_argument('-t', '--throws', help='number of section throwing attempts (default = 2000). A small number gives a low section density', required=False, default=2000)
+parser.add_argument('-a', '--angles', help='number of angles used to rotate the user templates (default = 30)', required=False, default=30)
+parser.add_argument('-x', '--xpatch', help='size in pixel of the final patch in x (default = 512)', required=False, default=512)
+parser.add_argument('-y', '--ypatch', help='size in pixel of the final patch in y (default = 512)', required=False, default=512)
+args = vars(parser.parse_args())
+
+jsonPath = os.path.normpath(args['json'])
+nPatches = int(args['patches'])
+nThrows = int(args['throws'])
+nAngles = int(args['angles'])
+xPatch = int(args['xpatch'])
+yPatch = int(args['ypatch'])
+patchSize = np.array([xPatch, yPatch])
+###################
+
+######################
+# Some initializations
 rootFolder = os.path.dirname(jsonPath)
 artificialFolder = os.path.join(rootFolder, 'artificialData')
 pathlib.Path(artificialFolder).mkdir(exist_ok=True)
 
-nPatches = 100
-nThrows = 2000
-nAngles = 30 # rotations of the templates
-
-patchSize = np.array([600,600])
 basketSize = (1.4 * patchSize).astype(int) # size of the large picture in which sections are thrown (sections are thrown into the basket). Will be cropped to patchSize after throwing.
 offset = (basketSize - patchSize)//2
 
@@ -34,10 +63,10 @@ imName = labelmeJson['imagePath']
 fluoName = imName.replace('BF_Test', 'DAPI')
 imPath = os.path.join(rootFolder, imName)
 fluoPath = os.path.join(rootFolder, fluoName)
+######################
 
-######################################
+##################################################################################
 # populate templates: points, masks, im, envelope area, etc. with different angles
-######################################
 templates = {}
 im = cv.imread(imPath, 0)
 imFluo = cv.imread(fluoPath, 0)
@@ -127,10 +156,10 @@ for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
 			# cv.imshow('image',fluoMasked)
 			# cv.waitKey(0)
 			# cv.destroyAllWindows()
+##################################################################################
 
-###############
+###########################################################################
 # Populate backgrounds and fluoBackgrounds from the labeled background area 
-###############
 backgrounds = []
 backgroundsFluo = []
 
@@ -154,10 +183,10 @@ for x in range(10): # no need to bother with correct indices, just try 10x10 box
 			backgroundsFluo.append(backgroundFluo)			
 del im
 del imFluo
+###########################################################################
 
-#########################
-# Main loop through the patches to generate
-#########################
+###########################################
+# Main loop through the patches to be generated
 for idPatch in range(nPatches):
 	successfulThrows = []
 	basket = np.zeros(basketSize, np.uint8) # container in which sections are thrown
@@ -180,7 +209,7 @@ for idPatch in range(nPatches):
 		basketBoxAfterThrow = cv.add(basketBox, template['e']['mask'])
 		whiteAfterThrow = cv.countNonZero(basketBoxAfterThrow)
 		if whiteAfterThrow - currentWhite == template['eSize']: # no collision
-			print('no collision', x, y, idThrow)
+			# print('no collision', x, y, idThrow)
 			basket[y:y+bbox[3], x:x+bbox[2]] = basketBoxAfterThrow
 			successfulThrows.append([templateId, x, y])
 
@@ -240,3 +269,4 @@ for idPatch in range(nPatches):
 	
 	imPatch = imPatch[offset[1]:patchSize[1]+offset[1], offset[0]:patchSize[0]+offset[0]] # crop to patchSize
 	cv.imwrite(imPath, imPatch)
+###########################################
