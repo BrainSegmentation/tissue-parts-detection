@@ -26,6 +26,7 @@ pathlib.Path(artificialFolder).mkdir(exist_ok=True)
 
 nPatches = 100
 nThrows = 1000
+nAngles = 10 # rotations of the templates
 
 patchSize = np.array([600,600])
 basketSize = (1.4 * patchSize).astype(int) # size of the large picture in which sections are thrown (sections are thrown into the basket). Will be cropped to patchSize after throwing.
@@ -47,7 +48,9 @@ im = cv.imread(imPath)
 imFluo = cv.imread(fluoPath,0)
 for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
 	templates[id] = {}
-
+	
+	centroid = np.mean(np.array(e['points']).T, axis = 1)
+	
 	bbox = cv.boundingRect(np.array(e['points'])) # the bounding box of the envelope
 	templates[id]['bbox'] = bbox
 
@@ -94,9 +97,20 @@ for id,[t,m,e] in enumerate(sections): # tissue, magnet, envelope
 	# cv.waitKey(0)
 	# cv.destroyAllWindows()
 
-######################################
-# populate nOrientations for each template
-######################################
+# ######################################
+# # populate nOrientations for each template
+# ######################################
+# angles = np.linspace(start=0, stop=360, num=nAngles)
+# counter = len(templates)
+# for template in templates:
+	# for angle in angles:
+		# template = copy.deepcopy(template)
+			
+		# xxx a larger bounding box is needed before rotating
+	
+		# templates[counter] = 
+		# counter = counter + 1
+
 
 ###############
 # Populate backgrounds and fluoBackgrounds from the labeled background area 
