@@ -63,7 +63,7 @@ with open(jsonPath, 'r') as f:
 sections = zip(*(iter(labelmeJson['shapes'][:-1]),) * 3) # 3 types of manual input: tissue, magnet, envelope
 
 imName = labelmeJson['imagePath']
-fluoName = imName.replace('BF_test', 'DAPI')
+fluoName = imName.replace('BF_Test', 'DAPI')
 imPath = os.path.join(rootFolder, imName)
 fluoPath = os.path.join(rootFolder, fluoName)
 ######################
@@ -218,7 +218,9 @@ for idPatch in range(nPatches):
 			successfulThrows.append([templateId, x, y])
 
 	# generate tissueMasks, magMasks, artificialPatch, artificialFluo,
-	patchFolder = os.path.join(artificialFolder, 'patch_' + str(patch_index + idPatch).zfill(4))
+	adjustedIdPatch = patch_index + idPatch # can be practical to put an offset when training with different wafers
+	
+	patchFolder = os.path.join(artificialFolder, 'patch_' + str(adjustedIdPatch).zfill(4))
 	mFolder = os.path.join(patchFolder, 'magnetic_masks')
 	tFolder = os.path.join(patchFolder, 'tissue_masks')
 	imageFolder = os.path.join(patchFolder, 'image')
@@ -264,8 +266,8 @@ for idPatch in range(nPatches):
 		fluoPatchBox = cv.bitwise_and(fluoPatchBox, fluoPatchBox, mask = eMaskInvert)
 		fluoPatch[y:y+bbox[3], x:x+bbox[2]] = cv.add(fluoPatchBox, template['e']['fluo'])
 
-	fluoPath = os.path.join(imageFolder, 'patch_' + str(idPatch).zfill(4) + '_fluo.tif')
-	imPath = os.path.join(imageFolder, 'patch_' + str(idPatch).zfill(4) + '.tif')
+	fluoPath = os.path.join(imageFolder, 'patch_' + str(adjustedIdPatch).zfill(4) + '_fluo.tif')
+	imPath = os.path.join(imageFolder, 'patch_' + str(adjustedIdPatch).zfill(4) + '.tif')
 
 	fluoPatch = fluoPatch[offset[1]:patchSize[1]+offset[1], offset[0]:patchSize[0]+offset[0]] # crop to patchSize
 	cv.imwrite(fluoPath, fluoPatch)
