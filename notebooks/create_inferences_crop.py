@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 import string
 
@@ -8,15 +9,7 @@ from PIL import Image
 import cv2 as cv
 import shutil
 
-DATASET_NUMBER = 11
 
-# Wafer file to crop
-file_wafersBIOP = "../augmented_dataset/newWafersBIOP/Wafer_"+str(DATASET_NUMBER)
-path_image = file_wafersBIOP+"/stitched_RGB_small.tif"
-wafer = Image.open(path_image)
-
-# Height and width of the resulting section in pixels
-section_size = 512
 
 def generate_batches(file_wafersBIOP, path_image, section_size):
 
@@ -46,4 +39,18 @@ def generate_batches(file_wafersBIOP, path_image, section_size):
 
 
 
-    generate_batches(file_wafersBIOP, path_image , section_size)
+
+
+def main():
+	DATASET_NUMBER = int(sys.argv[1])
+	section_size = int(sys.argv[2])
+	# Wafer file to crop
+	file_wafersBIOP = "../augmented_dataset/newWafersBIOP/Wafer_"+str(DATASET_NUMBER)
+	path_image = file_wafersBIOP+"/stitched_RGB_small.tif"
+	wafer = Image.open(path_image)
+
+
+	generate_batches(file_wafersBIOP, path_image, section_size)
+
+if __name__ == "__main__":
+    main()
