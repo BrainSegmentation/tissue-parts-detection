@@ -46,10 +46,14 @@ Resume training a model that you had trained earlier:
 **If you want to fully reimplement the training of the Brain segmentation :**
 
 Download the training/test set (links below)
+
 Download the Resnet50 weights (links below) (to use it as backbone)
 
+
 Go to our MaskRCNN fork (using the git clone recursive)
+
 Go to samples/braintissue, and in datasets/brainseg put all the training images in stage1_train, and all the test images in stage1_test
+
 Then edit brain.py to set your own parameters, and especially the list of Validation Test images (if you have new images)
 
 Then run : `$python brain.py train --dataset=datasets/brainseg --subset=train --weights=path_to_resnet50 weights`
@@ -57,11 +61,15 @@ Then run : `$python brain.py train --dataset=datasets/brainseg --subset=train --
 **If you want to use the trained model and train a more precise model based on this :**
 
 Get the data (training/test set) as previously
+
 Download the  brainseg.h5 weights
 
 Put your new images in stage1_train as well
+
 Do not forget to include some new images in the validation images list in brain.py
+
 Modify brain.py : in the function train : Uncomment the lines to train on the 'heads' layer and comment the lines to train of all the layers
+
 Set your parameters 
 
 Then run : `$python brain.py train --dataset=datasets/brainseg --subset=train --weights=path_to_brainseg_epoch weights`
