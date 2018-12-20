@@ -19,14 +19,26 @@ The machine used had following characteristics:
 - HD: **100 GB**
 - GPU: **8 GB**
 
-## Run
-
 ### Docker
 Docker image used is [nvidia-docker](https://github.com/NVIDIA/nvidia-docker), and sometimes [waleedka/modern-deep-learning
 ](https://hub.docker.com/r/waleedka/modern-deep-learning).
 
 Following command will mount the files from local machine location (left `~/Documents`) to the docker one (right `~/Documents`):
 `sudo nvidia-docker run -it -v ~/Documents:/Documents -p 8888:8888 brainsegmentation bash`
+
+## Files
+All the scripts are in notebooks
+- brain.py : File used to configure the training and to launch train/detection using MaskRCNN
+- gen_artificial_images.py : Generate artificial images (from extracted images) (v1)
+- artificialPatchGenerator.py : Generate artificial images (from json) (v2)
+
+And several notebooks
+- inspect_data : Observe the data provided to train the model
+- inspect_braintissue_model : Observe the model and the different steps with Mask RCNN
+
+Several notebooks used or to see the evolution of the data analysis and the generation of artificial images
+
+## Run
 
 ### Train
 
