@@ -1,4 +1,4 @@
-""" 
+"""
 gen_artificial_img.py
 ---
 Script to automaticly generate an artificial dataset of patches with their associated masks to train the model on
@@ -22,7 +22,7 @@ from PIL import Image
 # and for each images will generate the nb of batches (of size 512 by default) associated with the masks
 
 
-""" 
+"""
 Function to create a collision box around a section
 This is done by slicing our section image in N (number of boxes), and for each of them, draw a box that best fits the sliced section.
 Higher N will thus allow more precision on the section representation.
@@ -104,7 +104,9 @@ def get_collision_boxes(orig_section,nb_boxes = 4, rgb=False, draw = False):
             plt.imshow(section)
     return limit_boxes
 
-
+"""
+Function to generate the masks images from the input image (to get the size) and the associated masks points
+"""
 def generate_mask(image, points):
     # size of the image
     height = image.size[1]
@@ -118,8 +120,11 @@ def generate_mask(image, points):
 
     return img_mask
 
-
-def generate_artificial_batches(wafer, nb_batch, iter_img, DATASET_NUMBER, section_size, temp_path_seg_tissues, temp_path_seg_mag  ):
+"""
+Function to generate multiple crop patches from a generated artificial image
+It will then save the produced patches following the training structure, with the associated masks
+"""
+def generate_artificial_patches(wafer, nb_patch, iter_img, DATASET_NUMBER, section_size, temp_path_seg_tissues, temp_path_seg_mag  ):
 
     index = pd.MultiIndex.from_tuples([('point_1', 'x'), ('point_1', 'y'), ('point_2', 'x'), ('point_2', 'y'),
                                    ('point_3', 'x'), ('point_3', 'y'), ('point_4', 'x'), ('point_4', 'y')])
@@ -127,7 +132,7 @@ def generate_artificial_batches(wafer, nb_batch, iter_img, DATASET_NUMBER, secti
     seg_tissues = pd.read_csv(temp_path_seg_tissues, sep="\t|,", header=None, names=index, engine='python')
     seg_mag = pd.read_csv(temp_path_seg_mag, sep="\t|,", header=None, names=index, engine='python')
 
-    for i in range(1,nb_batch+1):
+    for i in range(1,nb_patch+1):
 
 
         # random crop coordinates (top-left point of the cropped area)
@@ -205,7 +210,10 @@ def generate_artificial_batches(wafer, nb_batch, iter_img, DATASET_NUMBER, secti
             cropped_image.save(path_img_tosave)
 
 
-
+"""
+Function to check if the possible area to put a section is actually free of already inserted section
+Takes as input the section and the x/y position to verify in the full image
+"""
 def check_avail_area(full_image,section,width, width_section, height, height_section, nb_collision_boxes, rgb):
 
     collision_boxes_section = get_collision_boxes(section, nb_collision_boxes, rgb, False)
@@ -240,7 +248,10 @@ def check_avail_area(full_image,section,width, width_section, height, height_sec
 
     return xpos_section, ypos_section, free_place
 
-
+"""
+Function to produce an artificial data, by randomly loading a section, randomly selecting a position in the image,
+and check if the space is free. It will then iterate until the algorithm can't find any free spaces anymore
+"""
 def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background, seg_coord_tissues, seg_coord_mag, rgb, max_num_section, temp_path_seg_tissues, temp_path_seg_mag ):
 
     if(rgb==True):
@@ -251,6 +262,8 @@ def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background,
     AUGMENTED_DATASET_PATH = "../augmented_dataset"
     WAFER_CROPPED_PATH = str(AUGMENTED_DATASET_PATH)+"/wafer_"+str(path_rgb)+"_cropped_"+str(DATASET_NUMBER)
 
+    # Initialize the artificial image as zeros with a size corresponding to a grid of loaded background_
+    # Ex : If grid_background is 4 and the background shape is 100x100 then the resulting image will be 400x400
     height, width = backgnd.shape[0]*grid_background, backgnd.shape[1]*grid_background
     if(rgb==True):
         full_image = np.zeros([height, width,3],dtype=np.uint8)
@@ -328,7 +341,11 @@ def create_artificial_images(iter_img, DATASET_NUMBER, backgnd, grid_background,
 
     return full_image
 
-
+"""
+Function called by the create_artificial_images to write the coordinates of each section in a file
+Each artificial image will have a temporary file, which will be used by the patch_generator to produce the cropped images
+with the associated masks
+"""
 def write_coordinates_file(coordinate_section,xpos_section, ypos_section, file_towrite):
 
         seg_p1_x = coordinate_section['point_1']['x'] + xpos_section
@@ -351,9 +368,12 @@ def write_coordinates_file(coordinate_section,xpos_section, ypos_section, file_t
 
 def main():
 
+
+    # -------------------- Arguments input
+
     if len(sys.argv) < 5:
         if len(sys.argv) == 2 and sys.argv[1] == "help":
-            print("""format: python3 gen_artificial_img.py <dataset number> <'rgb' / 'grayscale'> <nb artificial images> <nb batches per images> <section size> """)
+            print("""format: python3 gen_artificial_img.py <dataset number> <'rgb' / 'grayscale'> <nb artificial images> <nb patches per images> <section size> """)
             sys.exit()
         else:
             raise ValueError("Invalid number of arguments! Type help as arguments")
@@ -371,14 +391,14 @@ def main():
         raise ValueError("arg2 : Choose between 'rgb' or 'grayscale'")
 
     nb_artificial_images =  int(sys.argv[3])
-    number_batches = int(sys.argv[4])
+    number_patches = int(sys.argv[4])
 
     if(len(sys.argv) == 6):
         section_size = int(sys.argv[5])
     else:
         section_size = 512
 
-
+    # --------------------- End of args input
 
     if(rgb==True):
         path_rgb = "rgb"
@@ -391,6 +411,7 @@ def main():
     index = pd.MultiIndex.from_tuples([('point_1', 'x'), ('point_1', 'y'), ('point_2', 'x'), ('point_2', 'y'),
                                        ('point_3', 'x'), ('point_3', 'y'), ('point_4', 'x'), ('point_4', 'y')])
 
+    #Read the coordinates masks for all the sections to the associated dataset
     seg_coord_tissues = pd.read_csv(str(WAFER_CROPPED_PATH)+"/boxes_tissues.txt", sep="\t|,", header=None, names=index, engine='python')
     seg_coord_mag = pd.read_csv(str(WAFER_CROPPED_PATH)+"/boxes_mag.txt", sep="\t|,", header=None, names=index, engine='python')
 
@@ -401,7 +422,7 @@ def main():
         backgnd = cv.imread(path_background,0)
 
 
-
+    # Based on the currently extracted/segmented sections images available
     if(DATASET_NUMBER == 1):
         max_num_section = 100
     elif(DATASET_NUMBER == 2):
@@ -413,7 +434,7 @@ def main():
     # Size of artificial image (grid_background*size of background) for height and width
     grid_background = 4
 
-
+    # Temporary file which will be written by create_artificial_images and read by generate_artificial_patches
     temp_path_seg_tissues = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_tissues_artif_"+str(DATASET_NUMBER)+".txt"
     temp_path_seg_mag = str(AUGMENTED_DATASET_PATH)+"/artificial_images/seg_mag_artif_"+str(DATASET_NUMBER)+".txt"
 
@@ -427,8 +448,8 @@ def main():
             wafer = Image.fromarray(np.uint8(res),'RGB')
         else:
             wafer = Image.fromarray(np.uint8(res))
-        print("Create  "+str(number_batches)+ " batches from Artificial Image "+str(index_artificial_image))
-        generate_artificial_batches(wafer, number_batches, index_artificial_image, DATASET_NUMBER, section_size, temp_path_seg_tissues, temp_path_seg_mag )
+        print("Create  "+str(number_patches)+ " batches from Artificial Image "+str(index_artificial_image))
+        generate_artificial_patches(wafer, number_patches, index_artificial_image, DATASET_NUMBER, section_size, temp_path_seg_tissues, temp_path_seg_mag )
 
 
 if __name__ == "__main__":
