@@ -45,7 +45,7 @@ You have several options to run
 First using the notebooks to observe manually the outputs of the algorithms :
 - [Run merged cropped Images detection](https://github.com/BrainSegmentation/tissue-parts-detection/blob/master/notebooks/run_braintissue_model.ipynb)
 
-![Merged Multiple Crop Detection](merged.png)
+![Merged Multiple Crop Detection](assets/merged.png)
 
 - [Run single crop Images detection](https://github.com/BrainSegmentation/tissue-parts-detection/blob/master/notebooks/run_braintissue_single_crop.ipynb)
 
