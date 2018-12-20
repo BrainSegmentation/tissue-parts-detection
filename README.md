@@ -1,3 +1,6 @@
+# Github Link :
+https://github.com/BrainSegmentation/tissue-parts-detection
+
 # Tissue Part Detection
 
 Detecting brain tissue and magnet parts using [Mask R-CNN](https://github.com/matterport/Mask_RCNN). 
