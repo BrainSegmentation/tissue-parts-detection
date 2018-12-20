@@ -40,7 +40,7 @@ Several notebooks used or to see the evolution of the data analysis and the gene
 
 ## Run
 
-You have several options to run
+You have several options to run (all should include the Mask RCNN folder) and go to samples/braintissue
 
 First using the notebooks to observe manually the outputs of the algorithms :
 - [Run merged cropped Images detection](https://github.com/BrainSegmentation/tissue-parts-detection/blob/master/notebooks/run_braintissue_model.ipynb)
@@ -49,7 +49,12 @@ First using the notebooks to observe manually the outputs of the algorithms :
 
 - [Run single crop Images detection](https://github.com/BrainSegmentation/tissue-parts-detection/blob/master/notebooks/run_braintissue_single_crop.ipynb)
 
-![Cropped Detection](single.png)
+![Cropped Detection](https://raw.githubusercontent.com/BrainSegmentation/tissue-parts-detection/master/assets/single.PNG)
+
+
+Using the brain.py file :  
+By detecting on the test set : stage1_test folder in datasets/brainseg
+`$python brain.py detect --dataset=/path/to/dataset --subset=stage1_test --weights=last`
 
 ### Train
 
