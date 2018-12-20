@@ -40,6 +40,17 @@ Several notebooks used or to see the evolution of the data analysis and the gene
 
 ## Run
 
+You have several options to run
+
+First using the notebooks to observe manually the outputs of the algorithms :
+- [Run merged cropped Images detection](https://github.com/BrainSegmentation/tissue-parts-detection/blob/master/notebooks/run_braintissue_model.ipynb)
+
+![Merged Multiple Crop Detection](merged.png)
+
+- [Run single crop Images detection](https://github.com/BrainSegmentation/tissue-parts-detection/blob/master/notebooks/run_braintissue_single_crop.ipynb)
+
+![Cropped Detection](single.png)
+
 ### Train
 
 Train a new model using train dataset starting from specific weights file:
