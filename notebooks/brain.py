@@ -11,6 +11,17 @@ To BrainSegmentation project by Kevin Pelletier
 
 Usage: see main README file of the repo.
 """
+"""
+Usage: import the module (see Jupyter notebooks for examples), or run from
+       the command line as such:
+
+    # Train a new model starting from specific weights file
+    python brain.py train --dataset=/path/to/dataset --subset=train --weights=/path/to/weights.h5
+    # Resume training a model that you had trained earlier
+    python brain.py train --dataset=/path/to/dataset --subset=train --weights=last
+    # Generate submission file
+    python brain.py detect --dataset=/path/to/dataset --subset=train --weights=<last or /path/to/weights.h5>
+"""
 
 # Set matplotlib backend
 # This has to be done before other importa that might
