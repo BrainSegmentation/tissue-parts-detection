@@ -49,6 +49,12 @@ Open the link in your local computer:
 
 ## Links
 
+### Training - Test Dataset 
+https://mega.nz/#!amo2hYTQ!p0QQQCUAaBEAAhcQ7S6VGyHXEL_66J32FL-vKzF5zKA
+
+### Base Images for Augmented Artificial Images
+https://mega.nz/#!n3oSyCiD!yJ4rbm5hgNGH-MgoRQTPs2cn8q3yY6PbiliOWON32kc
+
 ### Report
 [Read-Only link to Report](https://www.overleaf.com/read/cqhkjdbxtmbr)
 
