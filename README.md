@@ -52,6 +52,12 @@ Open the link in your local computer:
 ### Training - Test Dataset 
 https://mega.nz/#!amo2hYTQ!p0QQQCUAaBEAAhcQ7S6VGyHXEL_66J32FL-vKzF5zKA
 
+### Weights of Braintissue Model (40 epochs)
+https://mega.nz/#!3mRTzKbB!rEpygnbG0WGdEysMNa8ULzcuu_AsfuM8PI2SHZs9F0w
+
+### Weights of Resnet50 backbone
+https://mega.nz/#!KzBXGC6Q!Sae8SI-7kjzGY3L5IdF7A9KQrcSxSByj8-bCKMjzm4M
+
 ### Base Images for Augmented Artificial Images
 https://mega.nz/#!n3oSyCiD!yJ4rbm5hgNGH-MgoRQTPs2cn8q3yY6PbiliOWON32kc
 
