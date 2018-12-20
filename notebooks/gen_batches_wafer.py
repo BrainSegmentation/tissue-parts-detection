@@ -1,3 +1,12 @@
+""" 
+gen_batches_wafer.py
+---
+Script to automaticly generate pathes from a given wafer image
+- Kevin Pelletier
+- Eliott Joulot
+- Jelena Banjac
+"""
+
 import os
 import sys
 import random

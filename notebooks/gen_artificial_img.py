@@ -1,3 +1,13 @@
+""" 
+gen_artificial_img.py
+---
+Script to automaticly generate an artificial dataset of patches with their associated masks to train the model on
+
+- Kevin Pelletier
+- Eliott Joulot
+- Jelena Banjac
+"""
+
 import os
 import sys
 import numpy as np
@@ -6,14 +16,17 @@ import random
 import cv2 as cv
 from PIL import Image
 
-
-## How to run the script
+## How to run the script:
 # python gen_artificial_img.py <Dataset_Number> <'rgb' or 'grayscale'> <nb of artificial images> <nb of batches> <size of produced batches images>
 # Nb of artificial images will generate the number of images (not saved)
-#and for each images will generate the nb of batches (of size 512 by default) associated with the masks
+# and for each images will generate the nb of batches (of size 512 by default) associated with the masks
 
-# python gen_artificial_img.py 1 rgb 20 8 512
 
+""" 
+Function to create a collision box around a section
+This is done by slicing our section image in N (number of boxes), and for each of them, draw a box that best fits the sliced section.
+Higher N will thus allow more precision on the section representation.
+"""
 def get_collision_boxes(orig_section,nb_boxes = 4, rgb=False, draw = False):
     #Divide the section into 5 block
     if(rgb == True):
@@ -27,8 +40,9 @@ def get_collision_boxes(orig_section,nb_boxes = 4, rgb=False, draw = False):
 
     limit_boxes = np.zeros([nb_boxes,4],dtype=np.uint16)
 
-    cut_height = (height_section//nb_boxes)+1
+    cut_height = (height_section//nb_boxes)+1 # Slicing the section in N boxes to create a specific number of boxes
     for cuts in range(nb_boxes):
+        # for each slice, we will find the smallest box that fits it
         i=0
 
         if((cuts)*cut_height + 4 >= height_section):
